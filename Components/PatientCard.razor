@@ -1,0 +1,37 @@
+<style>
+    .closeButton {
+        position: relative;
+        float: right;
+    }
+</style>
+<MudCard>
+    <MudCardContent>
+        <MudIconButton Icon="@Icons.Filled.Close" Class="closeButton" OnClick="UpdatePatientChanged"></MudIconButton>
+        <MudText><b>Patient Information</b></MudText>
+        <MudText Typo="Typo.body2">@patient.patientFirstName @patient.patientLastName</MudText>
+        <MudText Typo="Typo.body2">@patient.dob.ToShortDateString()</MudText>
+        <MudText Typo="Typo.body2">@patient.email</MudText>
+        <MudText Typo="Typo.body2">@patient.phone</MudText><Br />
+        <ModifyPatientButton patient="@patient" PatientChangedCallback="PatientModified"/>
+    </MudCardContent>
+</MudCard>
+
+@code {
+    [Parameter]
+    public Patient patient { get; set; } = null;
+    [Parameter]
+    public EventCallback<Patient> patientChanged {get; set;}
+
+    void PatientModified()
+    {
+        StateHasChanged();
+    }
+
+    async Task UpdatePatientChanged ()
+    {
+        await patientChanged.InvokeAsync(new Patient());
+    }
+}
+
+
+

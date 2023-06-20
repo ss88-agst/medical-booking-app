@@ -1,0 +1,10 @@
+<MudLayout Class="d-flex h-auto justify-content-between align-items-center">
+    <MudText><b>Welcome</b><br /> @name</MudText>
+    <NavLink href="/">
+        <MudButton Variant="Variant.Outlined" Color="Color.Primary">LOG OUT</MudButton>
+    </NavLink>
+</MudLayout>
+
+@code {
+    string name = "Nancy Appleseed";
+}

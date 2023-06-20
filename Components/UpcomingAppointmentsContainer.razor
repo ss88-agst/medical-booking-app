@@ -1,0 +1,17 @@
+﻿@if (listOfAppointmentsForThisPatient.Count() > 0)
+{
+    <div class="mt-4 overflow-scroll pa-0">
+        <div>
+            <h5>Upcoming Appointments</h5>
+        </div>
+        @foreach (Appointment appointment in listOfAppointmentsForThisPatient) {
+        <ExistingAppointmentTab doctorName="@appointment.DoctorName"
+                            visitReason="@appointment.VisitReason"
+                            dateOfAppointment="@appointment.AppointmentDate"></ExistingAppointmentTab>
+        }
+    </div>
+}
+@code {
+    [Parameter]
+    public List<Appointment> listOfAppointmentsForThisPatient { get; set; } = new List<Appointment>();
+}

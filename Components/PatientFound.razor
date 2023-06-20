@@ -1,0 +1,21 @@
+<MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="OnButtonClicked">Search Patient</MudButton>
+
+
+
+@code
+{
+    [Inject] private IDialogService DialogService { get; set; }
+
+    string state = "Patient Not Selected";
+
+
+    private async void OnButtonClicked()
+    {
+        bool? result = await DialogService.ShowMessageBox(
+            "Patient Found",
+            (MarkupString) $"Sarah Gomez<br/>November 13 2000<br/>sarah.gomez@gmail.com<br/>403-923-5345<br/>Dr. Miller",
+            yesText: "Select", cancelText: "Close");
+        state = result == null ? "Patient Not Selected" : "Patient Selected";
+        StateHasChanged();
+    }
+}

@@ -1,0 +1,20 @@
+﻿<div class="card card-container">
+    <div class="card-body">
+        <h5 class="card-title">
+            @dateOfAppointment.ToString("ddd, dd MMM @ HH:mm")
+        </h5>
+        <h6 class="card-subtitle">
+            @doctorName
+        </h6>
+    <div class="card-text">@visitReason</div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string doctorName { get; set; } = "";
+    [Parameter]
+    public DateTime dateOfAppointment { get; set; }
+    [Parameter]
+    public string visitReason { get; set; } = "";
+}

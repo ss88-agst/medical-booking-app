@@ -1,0 +1,48 @@
+@page "/"
+@inherits LayoutComponentBase
+
+<MudContainer Class="d-flex flex-column justify-content-center my-auto mx-auto pa-4" MaxWidth="MaxWidth.ExtraSmall" Style="height: 100vh">
+    <MudText Typo="Typo.h2" Class="flex-none mb-4">Sign In</MudText>
+    <MudTextField Label="Email" T="String" Variant="Variant.Outlined" Class="flex-none mb-2" @bind-value="@email"></MudTextField>
+    <MudTextField Label="Password" T="String" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="passwordVisibility" InputType="@PasswordInput" Variant="Variant.Outlined" Class="flex-none" @bind-value="@password"></MudTextField>
+    <br /><br />
+    
+    @if (email == "Nancyappleseed@gmail.com" && password == "qwerty")
+    {
+        value = "Main";
+    } else if (email == "admin@admin.com" && password == "admin")
+    {
+        value = "admin";
+    }
+    <NavLink href="@value">
+        <br />
+        <MudButton Class="d-flex flex-column justify-content-center my-auto mx-auto pa-4" Variant="Variant.Filled" Color="Color.Primary">Sign in</MudButton>
+    </NavLink>
+    
+</MudContainer>
+
+
+@code{
+    private string value = "";
+    private string email { get; set; }
+    private string password { get; set; }
+
+    InputType PasswordInput = InputType.Password;
+    string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+    bool passVisibility;
+
+    void passwordVisibility()
+    {
+        @if (passVisibility)
+        {
+            passVisibility = !passVisibility;
+            PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+            PasswordInput = InputType.Password;
+        } else
+        {
+            passVisibility = !passVisibility;
+            PasswordInputIcon = Icons.Material.Filled.Visibility;
+            PasswordInput = InputType.Text;
+        }
+    }
+}

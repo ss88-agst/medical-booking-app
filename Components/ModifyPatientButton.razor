@@ -1,0 +1,36 @@
+@inject IDialogService DialogService
+
+<MudButton @onclick="OpenDialog" Variant="Variant.Filled" Color="Color.Primary">
+    Modify Patient
+</MudButton>
+
+@code {
+
+    [Parameter]
+    public Patient patient { get; set; }
+
+    [Parameter]
+    public EventCallback PatientChangedCallback { get; set; }
+
+    private async void OpenDialog()
+    {
+        DialogOptions closeOnEscapeKey = new DialogOptions() { CloseOnEscapeKey = true };
+        var parameters = new DialogParameters();
+        parameters.Add("patient", patient);
+        var dialog = DialogService.Show<ModifyPatient>("Modify Patient", parameters, closeOnEscapeKey);
+
+
+        var result = await dialog.Result;
+        var wasOk = (bool)result.Data;
+        var wasCancelled = result.Cancelled;
+
+        if (wasOk)
+        {
+            PatientChangedCallback.InvokeAsync();
+        }
+        else if (wasCancelled)
+        {
+            dialog.Close();
+        }
+    }
+}

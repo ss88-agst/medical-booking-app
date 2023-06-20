@@ -1,0 +1,198 @@
+<style>
+    .skipWeeks {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+
+    .bookAppointment {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+</style>
+<div class="skipWeeks">
+    <MudButton Variant="Variant.Filled">&#10094 Last Week</MudButton>
+    <MudButton Variant="Variant.Filled">Jump to present</MudButton>
+    <MudButton Variant="Variant.Filled"> Next Week &#10095</MudButton>
+</div>
+
+<MudSimpleTable Style="overflow-x: auto;"
+                MultiSelection="true" Hover="true"
+                Breakpoint="Breakpoint.Sm"
+                Striped="true" Bordered="true"
+                CustomHeader="true"
+                CustomFooter="true"
+                HeaderClass="table-head-bordered"
+                FooterClass="table-foot-bordered"
+                Class="mt-4">
+    <thead>
+        <tr>
+            @foreach (var h in headings)
+            {
+                <th style="background-color: lightgrey">@h</th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @for (int i = 0; i < rows.Length; i++)
+        {
+            <tr class="row-@i">
+                @foreach (var x in rows[i].Split())
+                {
+                    <td>@x</td>
+                }
+            </tr>
+        }
+    </tbody>
+
+    @* Here's me adding the absolute pos appointment blocks on top of calendar *@
+
+    @* Tuesday app *@
+    <MudCard Style="width: 178px; height: 50px; top: 253px; left: 545px; background-color: #f76f72"
+             Outlined="true"
+             onclick="@ToggleTueOpen"
+             Class="rounded position-absolute cursor-pointer">
+
+        @* Uncomment content below to demonstrate the multiple appointments at one time*@
+        @*<MudCardContent>
+        <MudChip Variant="Variant.Text"
+        Style="right: 10px; bottom: 5px; color: white" Class="position-absolute">3</MudChip>
+        </MudCardContent>*@
+        <MudPopover Open="@_isTueOpen"
+                    AnchorOrigin="Origin.CenterRight"
+                    TransformOrigin="Origin.CenterLeft"
+                    Fixed="true"
+                    Style="width: 300px; max-height: 600px"
+                    Class="mx-n8 pt-4 pb-2 px-4 rounded-lg overflow-scroll">
+            @* Appointments in popover from here*@
+            <MudCard Class="elevation-3 my-2">
+                <MudCardHeader Class="d-flex flex-column justify-content-center align-items-center">
+                    <MudText Typo="Typo.h6">Dr. Edward Miller</MudText>
+                    <MudText Typo="Typo.subtitle1">10:00 - 11:00</MudText>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudText Typo="Typo.body1">Patient: Sarah Stor</MudText>
+                    <MudText Typo="Typo.body1">Reason: Stomachache</MudText>
+                </MudCardContent>
+                <MudCardActions Class="d-flex justify-content-between mt-2">
+                    <MudButton OnClick="@ToggleTueOpen" Color="Color.Error" Variant="Variant.Text">Cancel</MudButton>
+                    <MudButton OnClick="@ToggleTueOpen" Color="Color.Info" Variant="Variant.Text">Modify</MudButton>
+                </MudCardActions>
+            </MudCard>
+            @*
+            Uncomment appointments below to demonstrate multiple
+            appointments in one block
+            *@
+            @*<MudCard Class="elevation-3 my-2">
+            <MudCardHeader Class="d-flex flex-column justify-content-center align-items-center">
+            <MudText Typo="Typo.h6">Dr. Arnaud Fortier</MudText>
+            <MudText Typo="Typo.subtitle1">10:00 - 11:00</MudText>
+            </MudCardHeader>
+            <MudCardContent>
+            <MudText Typo="Typo.body1">Patient: Ben Dover</MudText>
+            <MudText Typo="Typo.body1">Reason: Stomachache</MudText>
+            </MudCardContent>
+            <MudCardActions Class="d-flex justify-content-between mt-2">
+            <MudButton OnClick="@ToggleTueOpen" Color="Color.Error" Variant="Variant.Text">Cancel</MudButton>
+            <MudButton OnClick="@ToggleTueOpen" Color="Color.Info" Variant="Variant.Text">Modify</MudButton>
+            </MudCardActions>
+            </MudCard>*@
+
+            @*<MudCard Class="elevation-3 my-2">
+                <MudCardHeader Class="d-flex flex-column justify-content-center align-items-center">
+                    <MudText Typo="Typo.h6">Dr. Cletus Croteau</MudText>
+                    <MudText Typo="Typo.subtitle1">10:00 - 11:00</MudText>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudText Typo="Typo.body1">Patient: John Doe</MudText>
+                    <MudText Typo="Typo.body1">Reason: Stomachache</MudText>
+                </MudCardContent>
+                <MudCardActions Class="d-flex justify-content-between mt-2">
+                    <MudButton OnClick="@ToggleTueOpen" Color="Color.Error" Variant="Variant.Text">Cancel</MudButton>
+                    <MudButton OnClick="@ToggleTueOpen" Color="Color.Info" Variant="Variant.Text">Modify</MudButton>
+                </MudCardActions>
+            </MudCard>*@
+
+
+            <div class="d-flex justify-content-center">
+                <MudIconButton OnClick="@ToggleTueOpen" Icon="@Icons.Filled.Close" Variant="Variant.Filled"
+                               Class="rounded-circle mt-3" />
+            </div>
+        </MudPopover>
+    </MudCard>
+
+    @* Wednesday appointment *@
+    <MudCard Style="width: 190px; height: 50px; top: 147px; left: 738px; background-color: #000000"
+             Outlined="true"
+             onclick="@ToggleWedOpen"
+             Class="rounded position-absolute cursor-pointer">
+        @*<MudCardContent>
+        <MudChip Variant="Variant.Text"
+        Style="right: 10px; bottom: 5px; color: white" Class="position-absolute">5</MudChip>
+        </MudCardContent>*@
+        <MudPopover Open="@_isWedOpen"
+                    AnchorOrigin="Origin.CenterRight"
+                    TransformOrigin="Origin.CenterLeft"
+                    Fixed="true"
+                    Style="width: 300px; max-height: 600px"
+                    Class="mx-n8 pt-4 pb-2 px-4 rounded-lg overflow-scroll">
+            @* Appointments in popover from here*@
+            <MudCard Class="elevation-3 my-2">
+                <MudCardHeader Class="d-flex flex-column justify-content-center align-items-center">
+                    <MudText Typo="Typo.h6">Dr. John Black</MudText>
+                    <MudText Typo="Typo.subtitle1">08:00 - 09:00</MudText>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudText Typo="Typo.body1">Patient: Emilia Allen</MudText>
+                    <MudText Typo="Typo.body1">Reason: Migraine</MudText>
+                </MudCardContent>
+                <MudCardActions Class="d-flex justify-content-between mt-2">
+                    <MudButton OnClick="@ToggleWedOpen" Color="Color.Error" Variant="Variant.Text">Cancel</MudButton>
+                    <MudButton OnClick="@ToggleWedOpen" Color="Color.Info" Variant="Variant.Text">Modify</MudButton>
+                </MudCardActions>
+            </MudCard>
+            <div class="d-flex justify-content-center">
+                <MudIconButton OnClick="@ToggleWedOpen" Icon="@Icons.Filled.Close" Variant="Variant.Filled"
+                               Class="rounded-circle mt-3" />
+            </div>
+        </MudPopover>
+    </MudCard>
+
+
+</MudSimpleTable>
+
+<br />
+<BookAppointment/>
+
+
+
+@code {
+    string[] headings = { " ", "Sun 8", "Mon 9", "Tue 10", "Wed 11", "Thu 12", "Fri 13", "Sat 14" };
+    string[] rows = {
+        @"8:00       ",
+        @"9:00       ",
+        @"10:00       ",
+        @"11:00       ",
+        @"12:00       ",
+        @"1:00       ",
+        @"2:00       ",
+        @"3:00       ",
+        @"4:00       "
+    };
+
+    // Get width of column in appointment table so it looks fine
+    // on everyone's displays and not just mine
+    //float apBlockWidth = await JSRuntime.InvokeAsync<float>("return document.getElementsByClassName(\"row-0\")[0].firstChild.offsetWidth")
+    // nvm this can't be used cuz the MudBlazor components don't
+    // allow mixed C# and markup in the Style attribute
+
+    // For the Tuesday app popover
+    public bool _isTueOpen = false;
+    public void ToggleTueOpen() { _isTueOpen = !_isTueOpen; }
+
+    // For the Wednesday app popover
+    public bool _isWedOpen = false;
+    public void ToggleWedOpen() { _isWedOpen = !_isWedOpen; }
+}

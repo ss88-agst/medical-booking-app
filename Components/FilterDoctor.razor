@@ -1,0 +1,59 @@
+
+@if (selectedDoctor != "All Doctors" && selectedDoctor != "Dr. Miller" && selectedDoctor != "Dr. Croteau" && selectedDoctor != "Dr. Black" && selectedDoctor != "Dr. Fortier"){
+    selectedDoctor = "All Doctors";
+}
+<MudButtonGroup Color="Color.Primary" Variant="Variant.Outlined">
+    <MudButton>@selectedDoctor</MudButton>
+    <MudMenu Icon="@Icons.Material.Filled.ArrowDropDown">
+        <MudMenuItem OnClick="() => SetButtonText(0)">All Doctors</MudMenuItem>
+        <MudMenuItem OnClick="() => SetButtonText(1)">Dr. Miller</MudMenuItem>
+        <MudMenuItem OnClick="() => SetButtonText(2)">Dr. Black</MudMenuItem>
+        <MudMenuItem OnClick="() => SetButtonText(3)">Dr. Fortier</MudMenuItem>
+        <MudMenuItem OnClick="() => SetButtonText(4)">Dr. Croteau</MudMenuItem>
+    </MudMenu>
+</MudButtonGroup>
+
+
+@code {
+    [Parameter]
+    public string selectedDoctor { get; set; }
+
+    [Parameter]
+    public EventCallback<string> selectedDoctorChanged { get; set; }
+
+    async Task UpdateDoctorSelection ()
+    {
+        await selectedDoctorChanged.InvokeAsync(selectedDoctor);
+    }
+
+    private void SetButtonText(int id)
+    {
+        switch (id)
+        {
+            case 0:
+                selectedDoctor = "All Doctors";
+                break;
+            case 1:
+                selectedDoctor = "Dr. Miller";
+                break;
+            case 2:
+                selectedDoctor = "Dr. Black";
+                break;
+            case 3:
+                selectedDoctor = "Dr. Fortier";
+                break;
+            case 4:
+                selectedDoctor = "Dr. Croteau";
+                break;
+        }
+        UpdateDoctorSelection();
+    }
+}
+
+
+
+
+
+
+
+

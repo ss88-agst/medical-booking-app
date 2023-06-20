@@ -1,0 +1,51 @@
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+
+<MudButton @onclick="OpenDialog" Variant="Variant.Filled" Color="Color.Primary">
+    Book Appointment
+</MudButton>
+
+@code {
+    [Parameter]
+    public EventCallback AppointmentChangedCallback { get; set; }
+
+    [Parameter]
+    public Patient patient { get; set; }
+
+    public void notify(string msg, Severity severity)
+    {
+        Snackbar.Add(msg, severity, config =>
+        {
+            config.VisibleStateDuration = 2000;
+        });
+    }
+
+    private async void OpenDialog()
+    {
+        if (patient.patientFirstName == "" && patient.patientLastName == "")
+        {
+            notify("No patient selected!", Severity.Error);
+        }
+        else
+        {
+            DialogOptions closeOnEscapeKey = new DialogOptions() { CloseOnEscapeKey = true };
+            var parameters = new DialogParameters();
+            parameters.Add("patient", patient);
+            var dialog = DialogService.Show<BookDialog>("Book Appointment", parameters, closeOnEscapeKey);
+
+
+            var result = await dialog.Result;
+            var wasOk = (bool)result.Data;
+            var wasCancelled = result.Cancelled;
+
+            if (wasOk)
+            {
+                AppointmentChangedCallback.InvokeAsync();
+            }
+            else if (wasCancelled)
+            {
+                dialog.Close();
+            }
+        }
+    }
+}

@@ -1,0 +1,211 @@
+﻿@inject ISnackbar Snackbar
+
+<MudItem xs="6" sm="4" md="3">
+    <MudCard Class="pa-4 mud-elevation-5 rounded-lg">
+        <MudCardHeader Class="mb-2">
+            <CardHeaderContent>
+                <MudText Typo="Typo.h5">@ReceptionistName</MudText>
+                <MudText Typo="Typo.subtitle2" Class="mt-2">@ReceptionistEmail</MudText>
+            </CardHeaderContent>
+            <CardHeaderActions>
+                <MudIconButton Icon="@Icons.Filled.Delete" Color="Color.Error"
+                               Disabled="@_isNameInputOpen" OnClick="DeleteCard"></MudIconButton>
+            </CardHeaderActions>
+        </MudCardHeader>
+        <MudCardActions Class="d-flex flex-column flex-grow-1">
+            <MudButton OnClick="@ToggleNameInputOpen"
+                       Variant="Variant.Outlined"
+                       Color="Color.Dark"
+                       Disabled="@(isAnyInputOpen())"
+                       Class="ma-1 w-100">
+                Change Name
+
+                @* Name input *@
+                <MudPopover Open="@_isNameInputOpen"
+                            AnchorOrigin="Origin.CenterRight"
+                            TransformOrigin="Origin.CenterLeft"
+                            Class="mx-n8 pt-4 pb-2 px-4 rounded-lg">
+                    <MudLayout>
+                        <MudTextField T="string"
+                                      Variant="Variant.Outlined"
+                                      Label="New name"
+                                      Margin="Margin.Dense"
+                                      Class="ma-1"
+                                      @bind-Value="@newName" />
+                    </MudLayout>
+                    <MudLayout Class="d-flex justify-content-between mt-2">
+                        <MudButton OnClick="@ToggleNameInputOpen" Color="Color.Error">Cancel</MudButton>
+                        <MudButton OnClick="@changeName" Color="Color.Info">Change</MudButton>
+                    </MudLayout>
+                </MudPopover>
+            </MudButton>
+
+            <MudButton OnClick="@ToggleEmailInputOpen"
+                       Variant="Variant.Outlined"
+                       Color="Color.Dark"
+                       Disabled="@(isAnyInputOpen())"
+                       Class="ma-1 w-100">
+                Change Email
+
+                @* Email input *@
+                <MudPopover Open="@_isEmailInputOpen"
+                            AnchorOrigin="Origin.CenterRight"
+                            TransformOrigin="Origin.CenterLeft"
+                            Class="mx-n8 pt-4 pb-2 px-4 rounded-lg">
+                    <MudLayout>
+                        <MudTextField T="string"
+                                      Variant="Variant.Outlined"
+                                      Label="New email"
+                                      Margin="Margin.Dense"
+                                      Class="ma-1"
+                                      @bind-Value="@newEmail" />
+                    </MudLayout>
+                    <MudLayout Class="d-flex justify-content-between mt-2">
+                        <MudButton OnClick="@ToggleEmailInputOpen" Color="Color.Error">Cancel</MudButton>
+                        <MudButton OnClick="@changeEmail" Color="Color.Info">Change</MudButton>
+                    </MudLayout>
+                </MudPopover>
+            </MudButton>
+
+            <MudButton OnClick="@TogglePasswordInputOpen"
+                       Variant="Variant.Outlined"
+                       Color="Color.Dark"
+                       Disabled="@(isAnyInputOpen())"
+                       Class="ma-1 w-100">
+                Change Password
+
+                @* Password input *@
+                <MudPopover Open="@_isPasswordInputOpen"
+                            AnchorOrigin="Origin.CenterRight"
+                            TransformOrigin="Origin.CenterLeft"
+                            Class="mx-n8 pt-4 pb-2 px-4 rounded-lg">
+                    <MudLayout>
+                        <MudTextField T="string"
+                                      Variant="Variant.Outlined"
+                                      Label="New password"
+                                      Margin="Margin.Dense"
+                                      Adornment="Adornment.End"
+                                      AdornmentIcon="@PasswordInputIcon"
+                                      OnAdornmentClick="passwordVisibility"
+                                      InputType="@PasswordInput"
+                                      Class="ma-1"
+                                      @bind-Value="@newPassword" />
+                    </MudLayout>
+                    <MudLayout Class="d-flex justify-content-between mt-2">
+                        <MudButton OnClick="@TogglePasswordInputOpen" Color="Color.Error">Cancel</MudButton>
+                        <MudButton OnClick="@changePassword" Color="Color.Info">Change</MudButton>
+                    </MudLayout>
+                </MudPopover>
+            </MudButton>
+        </MudCardActions>
+    </MudCard>
+</MudItem>
+
+
+@code {
+    public string newName { get; set; }
+    public string newEmail { get; set; }
+    public string newPassword { get; set; } = "";
+
+    [Parameter]
+    public string ReceptionistName { get; set; }
+
+    [Parameter]
+    public string ReceptionistEmail { get; set; }
+
+    [Parameter]
+    public EventCallback<int> DeleteCardCallback { get; set; }
+
+    [Parameter]
+    public int ID { get; set; }
+
+    private async Task DeleteCard()
+    {
+        await DeleteCardCallback.InvokeAsync(ID);
+    }
+
+    public bool _isNameInputOpen;
+    public bool _isEmailInputOpen;
+    public bool _isPasswordInputOpen;
+
+    public bool isAnyInputOpen() => _isNameInputOpen || _isEmailInputOpen || _isPasswordInputOpen;
+
+
+    public void ToggleNameInputOpen()
+    {
+        _isNameInputOpen = !_isNameInputOpen;
+        newName = "";
+    }
+
+    public void ToggleEmailInputOpen()
+    {
+        _isEmailInputOpen = !_isEmailInputOpen;
+        newEmail = "";
+    }
+
+    public void TogglePasswordInputOpen()
+    {
+        _isPasswordInputOpen = !_isPasswordInputOpen;
+        newPassword = "";
+    }
+
+    public void changeName()
+    {
+        _isNameInputOpen = false;
+        ReceptionistName = newName;
+        newName = "";
+        notify("Name has been changed!", Severity.Success);
+    }
+
+    public void changeEmail()
+    {
+        _isEmailInputOpen = false;
+        ReceptionistEmail = newEmail;
+        newEmail = "";
+        notify("Email has been changed!", Severity.Success);
+    }
+
+    public void changePassword()
+    {
+        if (newPassword == "")
+        {
+            notify("Password cannot be empty!", Severity.Error);
+        }
+        else
+        {
+            _isPasswordInputOpen = false;
+            newPassword = "";
+            notify("Password has been changed!", Severity.Success);
+        }
+    }
+
+    public void notify(string msg, Severity severity)
+    {
+        Snackbar.Add(msg, severity, config =>
+        {
+            config.VisibleStateDuration = 2000;
+        });
+    }
+
+    // For password input stuff
+
+    InputType PasswordInput = InputType.Password;
+    string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+    bool passVisibility;
+
+    void passwordVisibility()
+    {
+        @if (passVisibility)
+        {
+            passVisibility = !passVisibility;
+            PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+            PasswordInput = InputType.Password;
+        }
+        else
+        {
+            passVisibility = !passVisibility;
+            PasswordInputIcon = Icons.Material.Filled.Visibility;
+            PasswordInput = InputType.Text;
+        }
+    }
+}

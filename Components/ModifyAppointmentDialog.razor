@@ -1,0 +1,86 @@
+﻿<MudDialog>
+    <DialogContent>
+        <MudItem xs="12">
+            <MudSelect T="string" Label="Appointment Type" @bind-Value="@Reason" AnchorOrigin="Origin.BottomCenter">
+                <MudSelectItem Value="@("Check up")" />
+                <MudSelectItem Value="@("Consultation")" />
+                <MudSelectItem Value="@("Immunization")" />
+            </MudSelect>
+        </MudItem>
+        <br />
+
+        <MudDatePicker Label="Date" @bind-Date="@Date" DisableToolbar="true" />
+        <br />
+
+        <div class="d-flex">
+            <MudSelect T="int" Dense="true" Label="Hour" Style="width: 100px" @bind-Value="@Hour" AnchorOrigin="Origin.BottomCenter">
+                <MudSelectItem Value="8" />
+                <MudSelectItem Value="9" />
+                <MudSelectItem Value="10" />
+                <MudSelectItem Value="11" />
+                <MudSelectItem Value="12" />
+                <MudSelectItem Value="1" />
+                <MudSelectItem Value="2" />
+                <MudSelectItem Value="3" />
+                <MudSelectItem Value="4" />
+            </MudSelect>
+            <MudSelect T="int" Dense="true" Label="Minute" Style="width: 100px" @bind-Value="@Minutes" AnchorOrigin="Origin.BottomCenter">
+                <MudSelectItem Value="00" />
+                <MudSelectItem Value="30" />
+            </MudSelect>
+        </div>
+
+
+        <MudTextField T="string" Label="Additional Notes"></MudTextField>
+        <br />
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@Submit">Confirm</MudButton>
+        <MudButton Variant="Variant.Filled" OnClick="@Cancel">Cancel</MudButton>
+    </DialogContent>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    [Parameter]
+    public Appointment PrevAppointment { get; set; }
+
+    public DateTime? Date { get; set; }
+    public string Reason { get; set; } = "";
+    public int Hour { get; set; } = 8;
+    public int Minutes { get; set; } = 00;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        Date = PrevAppointment.AppointmentDate.Date;
+    }
+
+    public int GetHour()
+    {
+        if (Hour < 13)
+        {
+            return Hour;
+        }
+        else
+        {
+            return 12 + Hour;
+        }
+    }
+
+    public void Modify()
+    {
+        int index = Appointment.SampleAppointments.FindIndex(x => x.ID == PrevAppointment.ID);
+        DateTime d = Date.Value.AddHours(GetHour()).AddMinutes(Minutes);
+        Appointment a = new Appointment(PrevAppointment.ID, PrevAppointment.DoctorName, PrevAppointment.patient, Reason, d);
+        Appointment.SampleAppointments[index] = a;
+    }
+
+    void Submit()
+    {
+        Modify();
+        MudDialog.Close(DialogResult.Ok(true));
+    }
+
+    void Cancel() => MudDialog.Cancel();
+}
+

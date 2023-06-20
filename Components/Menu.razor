@@ -1,0 +1,16 @@
+<h3>Menu</h3>
+<MudButton Variant="Variant.Filled" Color="Color.Info" OnClick="OnButtonClicked"></MudButton>
+
+
+@code {
+    [Inject] private IDialogService DialogService { get; set; }
+
+    private async void OnButtonClicked()
+    {
+        bool? result = await DialogService.ShowMessageBox(
+            "Appointment",
+            (MarkupString)$"<b>Sarah Gomez </b><br /> Dr. Miller<br />Check up <br /> <b/>",
+            yesText: "Modify", cancelText: "Cancel Appt.");
+        
+    }
+}

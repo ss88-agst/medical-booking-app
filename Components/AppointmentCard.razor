@@ -1,0 +1,99 @@
+﻿@inject IDialogService DialogService
+
+<MudPopover Open="@_isOpen"
+            AnchorOrigin="Origin.CenterRight"
+            TransformOrigin="Origin.CenterLeft"
+            Style="width: 300px; max-height: 600px"
+            Class="mx-n8 pt-4 pb-2 px-4 rounded-lg overflow-scroll">
+
+    @* Appointments in popover from here*@
+    <MudCard Class="elevation-3 my-2">
+        <MudCardHeader Class="d-flex flex-column justify-content-center align-items-center">
+            <MudText Typo="Typo.h6">@DrName</MudText>
+            <MudText Typo="Typo.subtitle1">@StartTime.ToString("hh:mm")</MudText>
+        </MudCardHeader>
+        <MudCardContent>
+            <MudText Typo="Typo.body1">
+                Patient: @Patient.patientFirstName @Patient.patientLastName
+            </MudText>
+            <MudText Typo="Typo.body1">
+                Email: @Patient.email
+            </MudText>
+            <MudText Typo="Typo.body1">
+                Phone: @Patient.phone
+            </MudText>
+            <MudText Typo="Typo.body1">Reason: @Reason</MudText>
+        </MudCardContent>
+        <MudCardActions Class="d-flex justify-content-between mt-2">
+            <MudButton OnClick="@DeleteAppointment" Color="Color.Error" Variant="Variant.Text">Delete</MudButton>
+            <MudButton OnClick="@OpenModifyAppointmentDialog" Color="Color.Info" Variant="Variant.Text">Modify</MudButton>
+        </MudCardActions>
+    </MudCard>
+    <div class="d-flex justify-content-center">
+        <MudIconButton OnClick="@ToggleOpen" Icon="@Icons.Filled.Close" Variant="Variant.Filled"
+                       Class="rounded-circle mt-3" />
+    </div>
+</MudPopover>
+
+@code {
+    public string DrName { get; set; } = "";
+    public DateTime StartTime { get; set; }
+    //public string PatientFirstName { get; set; } = "";
+    //public string PatientLastName { get; set; } = "";
+    public Patient Patient { get; set; } = new Patient();
+    public string Reason { get; set; } = "";
+
+    [Parameter]
+    public Appointment Appointment { get; set; }
+
+    [Parameter]
+    public EventCallback AppointmentChangedCallback { get; set; }
+
+    public bool _isOpen = false;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        DrName = Appointment.DoctorName;
+        StartTime = Appointment.AppointmentDate;
+        //PatientFirstName = Appointment.PatientFirstName;
+        //PatientLastName = Appointment.PatientLastName;
+        Patient = Appointment.patient;
+        Reason = Appointment.VisitReason;
+    }
+
+    public void ToggleOpen()
+    {
+        _isOpen = !_isOpen;
+    }
+
+    public async void DeleteAppointment()
+    {
+        var AppointmentToRemove = Appointment.SampleAppointments.Find(x => x.ID == Appointment.ID);
+        Appointment.SampleAppointments.Remove(AppointmentToRemove);
+
+        await AppointmentChangedCallback.InvokeAsync();
+        _isOpen = false;
+    }
+
+    private async void OpenModifyAppointmentDialog()
+    {
+        _isOpen = false;
+        DialogOptions closeOnEscapeKey = new DialogOptions() { CloseOnEscapeKey = true };
+        var parameters = new DialogParameters();
+        parameters.Add("PrevAppointment", Appointment);
+        var dialog = DialogService.Show<ModifyAppointmentDialog>("Modify Appointment", parameters, closeOnEscapeKey);
+
+        var result = await dialog.Result;
+        var wasOk = (bool) result.Data;
+        var wasCancelled = result.Cancelled;
+
+        if (wasOk)
+        {
+            await AppointmentChangedCallback.InvokeAsync();
+        } else if (wasCancelled)
+        {
+            dialog.Close();
+        }
+    }
+}

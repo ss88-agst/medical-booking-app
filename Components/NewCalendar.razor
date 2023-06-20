@@ -1,0 +1,246 @@
+@using System.Diagnostics.CodeAnalysis;
+@inject IDialogService DialogService
+
+<MudContainer Class="mt-8">
+    <MudLayout Class="d-flex justify-content-center">
+        <MudText Typo="Typo.h4">
+            @startOfWeek.ToString("MMMM", currentCulture) @startOfWeek.Year
+        </MudText>
+    </MudLayout>
+
+
+    <div class="d-flex justify-content-between skipWeeks mt-8">
+        <FilterDoctor @bind-selectedDoctor="selectedDoctor" />
+        <MudButton Variant="Variant.Filled" OnClick="LastWeek">&#10094 Last Week</MudButton>
+        <MudButton Variant="Variant.Filled" OnClick="ThisWeek">Jump to present</MudButton>
+        <MudButton Variant="Variant.Filled" OnClick="NextWeek"> Next Week &#10095</MudButton>
+        <MudButton></MudButton>
+    </div>
+    <!-- Calendar proper from here-->
+    <MudLayout Class="d-flex mt-2 gap-0">
+        <MudLayout Class="d-flex flex-column gap-0">
+            <MudPaper Class="calendar-cell elevation-0" Style="background-color: lightgrey"></MudPaper>
+            <MudPaper id="08:00" Class="calendar-cell elevation-0">08:00</MudPaper>
+            <MudPaper id="09:00" Class="calendar-cell elevation-0">09:00</MudPaper>
+            <MudPaper id="10:00" Class="calendar-cell elevation-0">10:00</MudPaper>
+            <MudPaper id="11:00" Class="calendar-cell elevation-0">11:00</MudPaper>
+            <MudPaper id="12:00" Class="calendar-cell elevation-0">12:00</MudPaper>
+            <MudPaper id="1:00" Class="calendar-cell elevation-0">1:00</MudPaper>
+            <MudPaper id="2:00" Class="calendar-cell elevation-0">2:00</MudPaper>
+            <MudPaper id="3:00" Class="calendar-cell elevation-0">3:00</MudPaper>
+            <MudPaper id="4:00" Class="calendar-cell elevation-0">4:00</MudPaper>
+        </MudLayout>
+        @foreach (Day day in currentWeek.Dates)
+        {
+            var sequence = Appointment.SampleAppointments.Where(t => t.DoctorName.Equals(selectedDoctor));
+            if (selectedDoctor == "All Doctors")
+            {
+                sequence = Appointment.SampleAppointments;
+            }
+            string label = @day.Date.DayOfWeek.ToString() + " " + @day.Date.Day.ToString();
+            <MudLayout Class="d-flex flex-column gap-0">
+                <MudPaper Class="calendar-cell elevation-0" Style="background-color: lightgrey">
+                    <MudMenu Label="@label">
+                        <MudMenuItem>Dr. Miller:   8:00 - 4:00</MudMenuItem>
+                        <MudMenuItem>Dr. Croteau:  9:00 - 3:00</MudMenuItem>
+                        <MudMenuItem>Dr. Black:    9:00 - 3:00</MudMenuItem>
+                        <MudMenuItem>Dr. Fortier: 10:00 - 4:00</MudMenuItem>
+                    </MudMenu>
+
+
+                </MudPaper>
+                @for (int i = 0; i < 9; i++)
+                {
+                    foreach (Appointment ap in sequence)
+                    {
+                        MudBlazor.Color color = Color.Primary;
+                        if ((int)ap.AppointmentDate.Date.Day == (int)@day.Date.Day && (((int)ap.AppointmentDate.Hour == (int)i + 8) | (int)ap.AppointmentDate.Hour == (int)i - 4))
+                        {
+                            var thisAppointment = Appointment.SampleAppointments.Where(t => t.AppointmentDate.Date.Day == (int)@day.Date.Day && t.AppointmentDate.Hour == i - 4);
+                            int totalPerSlot = thisAppointment.Count();
+                            if (totalPerSlot > 1 && selectedDoctor == "All Doctors")
+                            {
+                                color = Color.Secondary;
+                            }
+                            if ((int)ap.AppointmentDate.Minute == 30)
+                            {
+                                <MudPaper id="@i" Class="calendar-cell elevation-0">
+                                    <MudButtonGroup Style="height:100%; width:100%" VerticalAlign="true" Variant="Variant.Filled" OverrideStyles="false">
+                                        <MudButton FullWidth="true" Style="height:100%; width:100%"></MudButton>
+                                        <MudButton Variant="Variant.Filled" Color="@color" OnClick="@(() => OpenAppointmentPopover(ap.ID))" FullWidth="true" Style="height:100%; width:100%">
+                                            <AppointmentCard @ref="apCardRef"
+                                         Appointment="@ap"
+                                         AppointmentChangedCallback="AppointmentsChanged" />
+                                        </MudButton>
+                                    </MudButtonGroup>
+                                </MudPaper>
+                            }
+                            else
+                            {
+                                <MudPaper id="@i" Class="calendar-cell elevation-0">
+                                    <MudButtonGroup Style="height:100%; width:100%" VerticalAlign="true" Variant="Variant.Filled" OverrideStyles="false">
+                                        <MudButton FullWidth="true" Style="height:100%; width:100%"></MudButton>
+                                        <MudButton OnClick="@(() => OpenAppointmentPopover(ap.ID))" Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" Style="height:100%">
+                                            <AppointmentCard @ref="apCardRef"
+                                         Appointment="@ap"
+                                         AppointmentChangedCallback="AppointmentsChanged" />
+                                        </MudButton>
+                                    </MudButtonGroup>
+                                </MudPaper>
+                            }
+
+                            i++;
+                        }
+                    }
+
+                    if ((selectedDoctor == "Dr. Miller") | (selectedDoctor == "Dr. Black" && (i < 7 && i > 0)) | (selectedDoctor == "Dr. Croteau" && (i < 7 && i > 0)) | (selectedDoctor == "Dr. Fortier" && i > 1) | selectedDoctor == "All Doctors")
+                    {
+                        <MudPaper id="@i" Class="calendar-cell elevation-0">
+                            <MudButtonGroup Style="height:100%; width:100%" VerticalAlign="true" Variant="Variant.Filled" OverrideStyles="false">
+                                <MudButton FullWidth="true" Style="height:100%; width:100%"></MudButton>
+                                <MudButton FullWidth="true" Style="height:100%"></MudButton>
+                            </MudButtonGroup>
+                        </MudPaper>
+                    }
+                    else
+                    {
+
+                        <MudPaper id="@i" Class="calendar-cell elevation-0">
+                            <MudButtonGroup Style="height:100%; width:100%" VerticalAlign="true" Variant="Variant.Filled" OverrideStyles="false">
+                                <MudButton FullWidth="true" Style="height:100%; width:100%" Variant="Variant.Filled" Disabled="true"></MudButton>
+                            </MudButtonGroup>
+                        </MudPaper>
+                    }
+                }
+            </MudLayout>
+        }
+    </MudLayout>
+    <MudLayout Class="d-flex mt-4 justify-content-center">
+        <BookAppointment AppointmentChangedCallback="AppointmentsChanged" patient="_patient" />
+    </MudLayout>
+</MudContainer>
+
+@code {
+
+    [Parameter]
+    public Patient? patient { get; set; }
+
+    public Patient? _patient { get; set; } = new Patient("fakedata", "", "", "", "", new DateTime());
+
+    [Parameter]
+    public string selectedDoctor { get; set; }
+
+    List<Week> weeks = new List<Week>();
+    int weekLength = 7;
+
+    System.Globalization.CultureInfo currentCulture = System.Globalization.CultureInfo.CurrentCulture;
+
+    DateTime startOfWeek;
+    DateTime currentDay = DateTime.Today;
+    Week currentWeek = new Week();
+
+    // Parameter copy
+    DateTime? _JumpDate = DateTime.Today;
+
+    [Parameter]
+    public DateTime? JumpDate { get; set; }
+
+    protected override void OnInitialized()
+    {
+        _patient = patient;
+        UpdateCalendarValues(currentDay);
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        if (_JumpDate != JumpDate)
+        {
+            _JumpDate = JumpDate;
+
+            try
+            {
+                DateTime jd = JumpDate.Value;
+                UpdateCalendarValues(jd);
+            }
+            catch (InvalidOperationException _)
+            {
+
+            }
+        }
+        if (_patient != patient)
+        {
+            _patient = patient;
+        }
+    }
+
+    void LastWeek()
+    {
+        currentDay = currentDay.AddDays(-7);
+        UpdateCalendarValues(currentDay);
+    }
+
+    void NextWeek()
+    {
+        currentDay = currentDay.AddDays(7);
+        UpdateCalendarValues(currentDay);
+    }
+
+    void ThisWeek()
+    {
+        currentDay = DateTime.Today;
+        UpdateCalendarValues(currentDay);
+    }
+
+    /*
+    * Set new values in calendar based off of some day (eg when you choose a day in the jump to thing)
+    */
+    void UpdateCalendarValues(DateTime day)
+    {
+        startOfWeek = day.AddDays(-1 * (int)(day.DayOfWeek));
+
+        List<Day> currentWeekDays = new List<Day>();
+
+        for (int i = 0; i < weekLength; i++)
+        {
+            Day d = new Day();
+            d.Date = startOfWeek.AddDays(i);
+            currentWeekDays.Add(d);
+        }
+
+        currentWeek.Dates = currentWeekDays;
+    }
+
+
+    // Book appointment dialog on calendar cell click stuff
+    //private void OpenBookAppointmentDialog()
+    //{
+    //    DialogOptions closeOnEscapeKey = new DialogOptions() { CloseOnEscapeKey = true };
+
+    //    DialogService.Show<BookDialog>("Book Appointment", closeOnEscapeKey);
+    //}
+
+    [AllowNull]
+    public List<AppointmentCard> apPopoverRefs { get; set; } = new List<AppointmentCard>();
+
+    [AllowNull]
+    public AppointmentCard apCardRef { set => apPopoverRefs.Add(value); }
+
+    void OpenAppointmentPopover(int ID)
+    {
+        AppointmentCard ac = apPopoverRefs.Find(x => x.Appointment.ID == ID);
+        ac.ToggleOpen();
+    }
+
+    // For when an appointment is changed
+
+    [Parameter]
+    public EventCallback AppointmentChangedCallback { get; set; }
+
+    public async Task AppointmentsChanged()
+    {
+        apPopoverRefs.Clear();
+        await AppointmentChangedCallback.InvokeAsync();
+        StateHasChanged();
+    }
+}

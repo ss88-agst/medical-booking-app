@@ -1,0 +1,152 @@
+﻿@page "/admin"
+
+<MudContainer>
+    @*<MudIconButton Class="position-absolute" Icon="@Icons.Filled.ArrowBack"
+    Color="Color.Default" />*@
+    <MudLink Href="/">
+        <MudButton Variant="Variant.Outlined" Color="Color.Primary" Class="mt-4">Log out</MudButton>
+    </MudLink>
+    <MudLayout Class="d-flex flex-column pa-0 vh-100">
+        <MudLayout Style="flex-basis: 20vh" Class="d-flex flex-column justify-content-center align-items-center mt-4">
+            <MudText Typo="Typo.h3">Hi, @_adminName!</MudText>
+            <MudText Typo="Typo.subtitle1">Here you can manage account details of your receptionists</MudText>
+        </MudLayout>
+        <MudLayout Style="flex-basis: 10vh" Class="d-flex justify-content-between align-items-center">
+            <MudText Typo="Typo.h4" Class="mt-8 mb-8">Manage accounts</MudText>
+            <MudButton Color="Color.Success" Variant="Variant.Outlined" Class="h-50" OnClick="ToggleAddNewFormOpen" Disabled="@_isAddNewFormOpen">
+                Add new receptionist
+
+                @*Add new receptionist form*@
+                <MudPopover Open="@_isAddNewFormOpen"
+                            AnchorOrigin="Origin.BottomCenter"
+                            TransformOrigin="Origin.TopCenter"
+                            Class="mx-n8 pt-4 pb-2 px-4 rounded-lg">
+                    <MudLayout>
+                        <MudTextField T="string"
+                                      Variant="Variant.Outlined"
+                                      Label="Receptionist name"
+                                      Margin="Margin.Dense"
+                                      Class="ma-1"
+                                      @bind-Value="@nameInput"/>
+                        <MudTextField T="string"
+                                      Variant="Variant.Outlined"
+                                      Label="Receptionist email"
+                                      Margin="Margin.Dense"
+                                      Class="ma-1" 
+                                      @bind-Value="@emailInput"/>
+                        <MudTextField T="String"
+                                      Variant="Variant.Outlined"
+                                      Label="Password"
+                                      Margin="Margin.Dense"
+                                      Adornment="Adornment.End"
+                                      AdornmentIcon="@PasswordInputIcon"
+                                      OnAdornmentClick="passwordVisibility"
+                                      InputType="@PasswordInput"
+                                      Class="ma-1" 
+                                      @bind-Value="@passwordInput"/>
+                    </MudLayout>
+                    <MudLayout Class="d-flex justify-content-between mt-2">
+                        <MudButton OnClick="@ToggleAddNewFormOpen" Color="Color.Error">Cancel</MudButton>
+                        <MudButton OnClick="@AddCard" Color="Color.Success">Add</MudButton>
+                    </MudLayout>
+                </MudPopover>
+            </MudButton>
+        </MudLayout>
+        <MudLayout Class="overflow-scroll">
+            <MudGrid Class="w-100">
+                @foreach (var item in rMap.Values)
+                {
+                    <ReceptionistCard ReceptionistName="@item.ReceptionistName" ReceptionistEmail="@item.ReceptionistEmail" ID="@item.ID" DeleteCardCallback="DeleteCard" />
+                }
+            </MudGrid>
+        </MudLayout>
+    </MudLayout>
+</MudContainer>
+
+
+
+@code {
+    class RCInfo
+    {
+        public int ID { get; set; }
+        public string ReceptionistName { get; set; }
+        public string ReceptionistEmail { get; set; }
+
+        public RCInfo(int ID, string ReceptionistName, string ReceptionistEmail)
+        {
+            this.ID = ID;
+            this.ReceptionistName = ReceptionistName;
+            this.ReceptionistEmail = ReceptionistEmail;
+        }
+
+        public override string ToString() { return $"{ID}: {ReceptionistName}, {ReceptionistEmail}"; }
+    }
+
+    String _adminName { get; set; } = "Betty";
+    int index = 0;
+
+    Dictionary<int, RCInfo> rMap = new Dictionary<int, RCInfo>();
+
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        rMap.Add(index, new RCInfo(index++, "Nancy Appleseed", "Nancyappleseed@gmail.com"));
+        foreach (var item in rMap) { Console.WriteLine(item.ToString()); }
+    }
+
+
+    // Add new receptionist form bind values
+    private string nameInput { get; set; }
+    private string emailInput { get; set; }
+    private string passwordInput { get; set; }
+
+
+
+    // Working on cards methods
+
+    void AddCard()
+    {
+        _isAddNewFormOpen = false;
+        rMap.Add(index, new RCInfo(index, nameInput, emailInput));
+        nameInput = "";
+        emailInput = "";
+        passwordInput = "";
+        foreach (var item in rMap) { Console.WriteLine(item.ToString()); }
+    }
+
+    void DeleteCard(int id)
+    {
+        Console.WriteLine($"deleting ReceptionistCard {id}");
+        rMap.Remove(id);
+    }
+
+
+    // For password input in add new receptionist form
+
+    InputType PasswordInput = InputType.Password;
+    string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+    bool passVisibility;
+
+    void passwordVisibility()
+    {
+        @if (passVisibility)
+        {
+            passVisibility = !passVisibility;
+            PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+            PasswordInput = InputType.Password;
+        }
+        else
+        {
+            passVisibility = !passVisibility;
+            PasswordInputIcon = Icons.Material.Filled.Visibility;
+            PasswordInput = InputType.Text;
+        }
+    }
+
+    // For popover opening and closing
+
+    public bool _isAddNewFormOpen = false;
+
+    public void ToggleAddNewFormOpen() => _isAddNewFormOpen = !_isAddNewFormOpen;
+}

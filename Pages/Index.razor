@@ -1,0 +1,46 @@
+@page "/Main"
+
+<MudContainer Class="mx-0 pa-0 vh-100 d-flex" MaxWidth="MaxWidth.ExtraExtraLarge">
+    <MudLayout Class="vw-20 vh-100 pa-4 flex-none d-flex flex-column" Style="max-height: 100vh">
+        <UserInfo />
+        <br />
+        <br />
+        <br />
+        @if (patientFound == null || patientFound.usualDoctor == "")
+        {
+            <PatientSearch @bind-isPatientFound="patientFound" />
+        }
+        else
+        {
+
+            <PatientCard @bind-patient="@patientFound" />
+            <UpcomingAppointmentsContainer listOfAppointmentsForThisPatient="@getAppointmentsOfPatient(patientFound)"></UpcomingAppointmentsContainer>
+        }
+
+    </MudLayout>
+
+    <MudLayout Class="d-flex flex-column">
+        <MudContainer Class="d-inline-flex flex-row align-items-center justify-content-center vh-10 flex-none px-100">
+            <MudText Typo="Typo.h6">Jump to:</MudText>
+            <MudDatePicker Class="ml-2" Placeholder="dd/mm/yyyy" @bind-Date="jumpDate" Mask="@(new DateMask("dd/MM/yyyy"))" Variant="Variant.Outlined" />
+        </MudContainer>
+        <MudLayout>
+            <NewCalendar JumpDate="@jumpDate" patient="@patientFound" selectedDoctor="@patientFound.usualDoctor" AppointmentChangedCallback="AppointmentsChanged" />
+        </MudLayout>
+    </MudLayout>
+</MudContainer>
+
+@code {
+    Patient? patientFound = new Patient();
+    DateTime? jumpDate = DateTime.Today;
+
+    List<Appointment> getAppointmentsOfPatient(Patient p)
+    {
+        return Appointment.SampleAppointments.Where(sample => sample.PatientFirstName.Equals(p.patientFirstName) && sample.PatientLastName.Equals(p.patientLastName) && sample.AppointmentDate > DateTime.Today).OrderBy(p => p.AppointmentDate).ToList();
+    }
+
+    public void AppointmentsChanged()
+    {
+        StateHasChanged();
+    }
+}
